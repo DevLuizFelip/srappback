@@ -4,14 +4,44 @@ FROM node:20-slim
 # Definir a pasta de trabalho dentro do contentor
 WORKDIR /usr/src/app
 
-# Atualizar os pacotes e instalar as dependências do sistema: ffmpeg e python/pip
+# Atualizar os pacotes e instalar as dependências do sistema
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Dependências para Puppeteer/Chrome
+    ca-certificates \
+    fonts-liberation \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdbus-1-3 \
+    libdrm2 \
+    libgbm1 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxi6 \
+    libxrandr2 \
+    libxrender1 \
+    libxss1 \
+    libxtst6 \
+    lsb-release \
+    wget \
+    xdg-utils \
+    # Nossas outras dependências
     ffmpeg \
     python3 \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar o yt-dlp usando pip, com a flag para contornar o erro de ambiente gerido
+# Instalar o yt-dlp usando pip
 RUN pip3 install yt-dlp --break-system-packages
 
 # Copiar os ficheiros de configuração do projeto

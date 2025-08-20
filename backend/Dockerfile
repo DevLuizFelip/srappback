@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar o yt-dlp usando pip
-RUN pip3 install yt-dlp
+# Instalar o yt-dlp usando pip, com a flag para contornar o erro de ambiente gerido
+RUN pip3 install yt-dlp --break-system-packages
 
 # Copiar os ficheiros de configuração do projeto
 COPY package*.json ./

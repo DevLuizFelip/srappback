@@ -44,14 +44,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     lsb-release \
     wget \
     xdg-utils \
-    # Nossas outras dependências
-    ffmpeg \
-    python3 \
-    python3-pip \
     && rm -rf /var/lib/apt/lists/*
-
-# Instalar o yt-dlp usando pip
-RUN pip3 install yt-dlp --break-system-packages
 
 # Copiar os ficheiros de configuração do projeto
 COPY package*.json ./

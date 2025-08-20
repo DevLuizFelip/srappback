@@ -4,8 +4,11 @@ FROM node:20-slim
 # Definir a pasta de trabalho dentro do contentor
 WORKDIR /usr/src/app
 
-# Atualizar os pacotes e instalar as dependências do sistema (LISTA COMPLETA E OFICIAL PARA PUPPETEER)
+# Instalar as dependências de sistema necessárias para o sharp e o puppeteer
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Dependências para sharp
+    libvips \
+    # Dependências para Puppeteer/Chrome
     ca-certificates \
     fonts-liberation \
     libasound2 \

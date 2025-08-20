@@ -4,21 +4,27 @@ FROM node:20-slim
 # Definir a pasta de trabalho dentro do contentor
 WORKDIR /usr/src/app
 
-# Atualizar os pacotes e instalar as dependências do sistema
+# Atualizar os pacotes e instalar as dependências do sistema (LISTA COMPLETA E OFICIAL PARA PUPPETEER)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    # Dependências para Puppeteer/Chrome
     ca-certificates \
     fonts-liberation \
     libasound2 \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
+    libcairo2 \
     libcups2 \
     libdbus-1-3 \
-    libdrm2 \
+    libexpat1 \
+    libfontconfig1 \
     libgbm1 \
+    libgconf-2-4 \
+    libgdk-pixbuf2.0-0 \
+    libglib2.0-0 \
     libgtk-3-0 \
     libnspr4 \
     libnss3 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
     libx11-6 \
     libx11-xcb1 \
     libxcb1 \

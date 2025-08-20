@@ -1,4 +1,4 @@
-// server.js (Versão para Deploy na Render)
+// server.js (Versão Final para Deploy na Render)
 
 // 1. Importar as bibliotecas necessárias
 const express = require('express');
@@ -6,6 +6,7 @@ const cors = require('cors');
 const axios = require('axios');
 const puppeteer = require('puppeteer');
 const { spawn } = require('child_process');
+const url = require('url');
 
 // 2. Inicializar o aplicativo Express
 const app = express();
@@ -17,7 +18,7 @@ app.use(cors());
 // --- Função para extrair mídia com yt-dlp (Versão para Servidor) ---
 async function extractMediaWithYtDlp(pageUrl) {
     console.log(`[DIAGNÓSTICO] Iniciando extração com yt-dlp para: ${pageUrl}`);
-    const ytDlpCommand = 'yt-dlp'; // Usa o comando instalado no sistema
+    const ytDlpCommand = 'yt-dlp'; // Usa o comando instalado no sistema pelo Dockerfile
     
     const args = [
         '--ignore-errors',
@@ -31,7 +32,7 @@ async function extractMediaWithYtDlp(pageUrl) {
         
         let stdoutData = '';
         ytDlpProcess.stdout.on('data', (data) => { stdoutData += data.toString(); });
-        ytDlpProcess.stderr.on('data', (data) => { /* Silenciar stderr */ });
+        ytDlpProcess.stderr.on('data', (data) => { /* Silenciar stderr para um log mais limpo */ });
 
         ytDlpProcess.on('close', (code) => {
             if (!stdoutData.trim()) {
@@ -49,7 +50,7 @@ async function extractMediaWithYtDlp(pageUrl) {
                             mediaItems.push({
                                 url: videoInfo.url,
                                 thumbnailUrl: videoInfo.thumbnail,
-                                author: videoInfo.uploader || new URL(pageUrl).hostname,
+                                author: videoInfo.uploader || new url.URL(pageUrl).hostname,
                                 type: 'video'
                             });
                         }
@@ -78,7 +79,6 @@ async function scrapeMediaWithPuppeteer(pageUrl) {
     const foundMedia = new Set(); 
 
     try {
-        // Adiciona a flag --no-sandbox, essencial para ambientes como o da Render
         browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
@@ -97,8 +97,8 @@ async function scrapeMediaWithPuppeteer(pageUrl) {
         const content = await page.content();
         const $ = require('cheerio').load(content);
 
-        $('img').each((i, el) => { const src = $(el).attr('src'); if (src) foundMedia.add(new URL(src, pageUrl).href); });
-        $('video').each((i, el) => { const src = $(el).attr('src') || $(el).find('source').attr('src'); if (src) foundMedia.add(new URL(src, pageUrl).href); });
+        $('img').each((i, el) => { const src = $(el).attr('src'); if (src) foundMedia.add(new url.URL(src, pageUrl).href); });
+        $('video').each((i, el) => { const src = $(el).attr('src') || $(el).find('source').attr('src'); if (src) foundMedia.add(new url.URL(src, pageUrl).href); });
 
         await browser.close();
         console.log(`[DIAGNÓSTICO] Scraping com Puppeteer concluído. Encontrados ${foundMedia.size} itens de mídia.`);
@@ -145,7 +145,7 @@ app.get('/api/media', async (req, res) => {
                     id: `scrape-${idCounter++}`,
                     type: isVideo ? 'video' : 'image',
                     url: mediaUrl,
-                    author: new URL(source).hostname,
+                    author: new url.URL(source).hostname,
                     source: 'web',
                     timestamp: new Date(),
                 });
@@ -167,10 +167,10 @@ app.get('/api/download', async (req, res) => {
       method: 'GET', url: fileUrl, responseType: 'stream',
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Referer': new URL(fileUrl).origin
+        'Referer': new url.URL(fileUrl).origin
       }
     });
-    const urlPath = new URL(fileUrl).pathname;
+    const urlPath = new url.URL(fileUrl).pathname;
     const filename = urlPath.substring(urlPath.lastIndexOf('/') + 1) || 'media.file';
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Type', response.headers['content-type']);

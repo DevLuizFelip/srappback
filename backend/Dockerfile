@@ -1,5 +1,5 @@
-# Usar uma imagem oficial do Node.js como base
-FROM node:18-slim
+# Usar uma imagem oficial e mais recente do Node.js como base
+FROM node:20-slim
 
 # Definir a pasta de trabalho dentro do contentor
 WORKDIR /usr/src/app
